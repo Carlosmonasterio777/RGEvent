@@ -1,0 +1,74 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeFile="Site.master.cs" Inherits="SiteMaster" %>
+
+<!DOCTYPE html>
+<html>
+<head runat="server">
+    <title></title>
+    <link href="~/Media/layout.css" rel="stylesheet" type="text/css" />
+    <asp:ContentPlaceHolder ID="HeadContent" runat="server"></asp:ContentPlaceHolder>
+    <style>
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    font-size: 18px;
+}
+
+li {
+    float: left;
+}
+
+li a {
+    display: block;
+    color: white;
+    text-align: center;
+    padding: 14px 50px;
+    text-decoration: none;
+}
+
+li a:hover:not(.active) {
+    background-color: #111;
+}
+
+        .active {
+            background-color: lightskyblue;
+        }
+</style>
+</head>
+<body>
+
+    <form runat="server">
+    <div class="page">
+        <div id="header">
+			<div class="bg-help">
+		
+					<h1 class="toolbar"></h1>
+                       <ul class="nav navbar-nav">
+                        <li><a runat="server" href="Default.aspx">Inicio</a></li>
+                        <li><a runat="server" href="New_user.aspx">Usuarios</a></li>
+                        <li><a runat="server" href="~/Reporte.aspx">Reportes</a></li>
+                 <li style="float:right"><a class="active" href="Login.aspx">Salir</a></li>
+                    </ul>
+       
+            </div>
+        </div>
+
+					<hr class="hidden" />
+			
+
+
+        <div class="shadow"></div>
+        <div class="main">
+            <asp:ContentPlaceHolder ID="MainContent" runat="server"/>
+        </div>
+        <div class="clear">
+        </div>
+    </div>
+    <div class="footer">
+        
+    </div>
+    </form>
+</body>
+</html>
+
