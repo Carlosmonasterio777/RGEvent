@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true"  CodeFile="New_User.aspx.cs" Inherits="_Default" MasterPageFile="~/Site.master" Title="Usuarios" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true"  CodeFile="Clientes.aspx.cs" Inherits="_Default" MasterPageFile="~/Site.master" Title="Clientes" %>
 <%@ Register Assembly="DayPilot" Namespace="DayPilot.Web.Ui" TagPrefix="DayPilot" %>
 <asp:Content ID="HeaderContent" runat="server" ContentPlaceHolderID="HeadContent">
     <script type="text/javascript" src="js/modal.js"></script>
@@ -17,19 +17,20 @@
 }
 
 body {
-  background-color: #2c3e50;
+   background-color: #2c3e50;
 }
 
 .container {
   max-width: 200px;
   margin: 20px ;
+
 }
 
 h2 {
   width: 100%;
   margin: 1em 0 .5em 1.2em;
   padding: 0;
-  color: rgba(255,255,255,.2)
+  color: rgba(255,255,255,.2);
 }
 
 a {
@@ -49,6 +50,7 @@ a:hover {
   text-align: center;
   padding: 1.25em;
   border-radius: 5px;
+
 }
 
 input {
@@ -168,33 +170,38 @@ h1 {
             }
 </style>
 
+
+
  <div class='container'>
-  <h2 runat="server" ID="titulo"><a></a></h2>
+  <h2 runat="server" ID="titulo"><a>
+      </a></h2>
+     
   <div class='form'>
-      <asp:Label ID="Label1" runat="server" Text="Nickname"></asp:Label>
-      <asp:TextBox ID="TextBox1" runat="server"></asp:TextBox>
-          <asp:RegularExpressionValidator ID="RegularExpressionValidator2" ControlToValidate="TextBox1" runat="server"  ErrorMessage="Nickname Invalido!" SetFocusOnError="true" ValidationExpression="^[A-Za-z\d$@$!%*?&]{4,30}"></asp:RegularExpressionValidator>  
-            <br />     
-      <asp:Label ID="Label2" runat="server" Text="Password"></asp:Label>
-      <asp:TextBox ID="passs" TextMode="Password" runat="server"></asp:TextBox>
-             <asp:RegularExpressionValidator ID="RegularExpressionValidator1" ControlToValidate="passs" runat="server" ErrorMessage="Password Invalido!" SetFocusOnError="true" ValidationExpression="^[A-Za-z\d$@$!%*?&]{4,30}"></asp:RegularExpressionValidator>  
-       
-
+      <asp:Label ID="Label1" runat="server" Text="DPI"></asp:Label>     
+<asp:TextBox ID="TextBox1"  runat="server" MaxLength="13" ></asp:TextBox>
+        <asp:RegularExpressionValidator ID="RegularExpressionValidator1" ControlToValidate="TextBox1" runat="server" ErrorMessage="DPI INVALIDO!" ValidationExpression="^[0-9]{13}$" SetFocusOnError="True"></asp:RegularExpressionValidator>  
+        <br />
+        
+      <asp:Label ID="Label2" runat="server" Text="Nombre"></asp:Label>
+      <asp:TextBox ID="TextBox2" MaxLength="200" runat="server"></asp:TextBox>
+            <asp:RegularExpressionValidator ID="RegularExpressionValidator2" ControlToValidate="TextBox2" runat="server" ErrorMessage="Nombre Invalido!" ValidationExpression="[a-zA-Z ]{2,254}" SetFocusOnError="True"></asp:RegularExpressionValidator>  
+           <br />
+            <asp:Label ID="Label3" runat="server"  Text="Telefono"></asp:Label>
       <br />
-            <asp:Label ID="Label3" runat="server" Text="Rol"></asp:Label>
-      <br />
-      <asp:DropDownList ID="DropDownList1" CssClass="ddlstyle form" runat="server"></asp:DropDownList>
+      <asp:TextBox ID="TextBox3" MaxLength="8" runat="server"></asp:TextBox>
+          <asp:RegularExpressionValidator ID="RegularExpressionValidator3" ControlToValidate="TextBox3" runat="server" ErrorMessage="Telefono Invalido!" ValidationExpression="[0-9]{8}" SetFocusOnError="True"></asp:RegularExpressionValidator> 
  <br />
-       <asp:Button ID="agregar" runat="server" CssClass="button" Text="Guardar" OnClick="Unnamed1_Click"> </asp:Button>
-        <asp:Button ID="eliminar" runat="server" CssClass="button" Text="Eliminar" OnClick="Unnamed2_Click"> </asp:Button>
-
+       <asp:Button  ID="agregar" runat="server" CssClass="button" Text="Guardar" OnClick="Unnamed1_Click"> </asp:Button>
+         <asp:Button ID="eliminar" runat="server" CssClass="button" Text="Eliminar" OnClick="Unnamed2_Click"> </asp:Button>
   </div>
-      <asp:RadioButtonList ID="RadioButtonList1" runat="server" RepeatDirection="Horizontal" Width="262px" AutoPostBack="True">
+
+    <asp:RadioButtonList ID="RadioButtonList1" runat="server" RepeatDirection="Horizontal" Width="262px" AutoPostBack="True">
       <asp:ListItem>Agregar</asp:ListItem>
       <asp:ListItem>Eliminar</asp:ListItem>
       </asp:RadioButtonList>
-    
     </div>
     <asp:GridView ID="GridView1" CssClass="mGrid" runat="server">
     </asp:GridView>
+
+   
 </asp:Content>

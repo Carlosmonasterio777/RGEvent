@@ -7,9 +7,6 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Web.UI.WebControls;
-using System.Data;
-using System.Data.SqlClient;
-using System.Configuration;
 using System.Web.UI;
 
 public partial class _Default : System.Web.UI.Page
@@ -30,13 +27,35 @@ public partial class _Default : System.Web.UI.Page
 
             GridView1.DataSource = ObtieneUsuarios();
             GridView1.DataBind();
+            RadioButtonList1.SelectedValue = "Agregar";
+        }
+        if (RadioButtonList1.SelectedValue == "Agregar")
+        {
+            eliminar.Visible = false;
+            passs.Visible = true;
+            agregar.Visible = true;
+            Label2.Visible = true;
+            Label3.Visible = true;
+            DropDownList1.Visible = true;
+            titulo.InnerText = "Agregar Usuario";
 
+        }
+
+        if (RadioButtonList1.SelectedValue == "Eliminar")
+        {
+            agregar.Visible = false;
+            passs.Visible = false;
+            Label2.Visible = false;
+            Label3.Visible = false;
+            eliminar.Visible = true;
+            DropDownList1.Visible = false;
+            titulo.InnerText = "Eliminar Usuario";
         }
 
     }
     public DataTable ObtieneUsuarios()
     {
-        SqlDataAdapter da = new SqlDataAdapter("select a.NICKNAME, b.descripcion ROL   from usuario a join rol b on a.id_rol = b.id_rol", ConfigurationManager.ConnectionStrings["daypilot"].ConnectionString);
+        SqlDataAdapter da = new SqlDataAdapter("select a.NICKNAME, b.descripcion ROL   from usuario a join rol b on a.id_rol = b.id_rol where a.id_estado = 1", ConfigurationManager.ConnectionStrings["daypilot"].ConnectionString);
 
         DataTable dt = new DataTable();
         da.Fill(dt);
@@ -55,11 +74,17 @@ public partial class _Default : System.Web.UI.Page
     }
 
     public void GuardaUsuario()
-    {
-        Model.user us = new Model.user();
+    {   
+    Model.user us = new Model.user();
+        string nick, pass;
 
         us.nickname = TextBox1.Text;
-        us.password = TextBox2.Text;
+        us.password = passs.Text;
+
+         nick = TextBox1.Text;
+         pass = passs.Text;
+
+
         us.rol = Int32.Parse(DropDownList1.SelectedValue.ToString());
         string resultado;
         using (SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["daypilot"].ConnectionString))
@@ -67,16 +92,71 @@ public partial class _Default : System.Web.UI.Page
             con.Open();
             SqlCommand cmd = new SqlCommand("GuardaUsuario", con);
             cmd.CommandType = CommandType.StoredProcedure;
-            cmd.Parameters.AddWithValue("user", us.nickname);
-            cmd.Parameters.AddWithValue("pass", us.password);
+            cmd.Parameters.AddWithValue("user", nick);
+            cmd.Parameters.AddWithValue("pass", pass);
             cmd.Parameters.AddWithValue("rol", us.rol);
+            resultado = (string)cmd.ExecuteScalar();
+
+            if (resultado == "OK")
+            {
+                ScriptManager.RegisterClientScriptBlock(this, GetType(),
+                 "Alert", @"alert('Usuario Creado correctamente')", true);
+                   LimpiaText();
+            }
+            else
+
+            {
+                ScriptManager.RegisterClientScriptBlock(this, GetType(),
+  "Alert", @"alert('Error al crear usuario')", true);
+                      LimpiaText();
+                return;
+            }
+
+        }
+
+}
+
+
+public void LimpiaText()
+    {
+        TextBox1.Text = null;
+        passs.Text = null;
+        TextBox1.Focus();
+    }
+
+
+    public void Unnamed1_Click(object sender, EventArgs e)
+    {
+        GuardaUsuario();
+        LimpiaText();
+        GridView1.DataSource = ObtieneUsuarios();
+        GridView1.DataBind();
+    }
+
+    protected void Unnamed2_Click(object sender, EventArgs e)
+    {
+        EliminaUsuario();
+        GridView1.DataSource = ObtieneUsuarios();
+        GridView1.DataBind();
+    }
+
+    public void EliminaUsuario()
+    {
+
+       using (SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["daypilot"].ConnectionString))
+        {
+            con.Open();
+            SqlCommand cmd = new SqlCommand("EliminaUsuario", con);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("user", TextBox1.Text);
+            string resultado;
             resultado = (string)cmd.ExecuteScalar();
 
             if (resultado == "OK")
             {
 
                 ScriptManager.RegisterClientScriptBlock(this, GetType(),
-                    "Alert", @"alert('Usuario registrado exitosamente')", true);
+                    "Alert", @"alert('Usuario eliminado exitosamente')", true);
                 GridView1.DataSource = ObtieneUsuarios();
                 GridView1.DataBind();
 
@@ -84,24 +164,11 @@ public partial class _Default : System.Web.UI.Page
             else
             {
                 ScriptManager.RegisterClientScriptBlock(this, GetType(),
-                "Alert", @"alert('Error al crear usuario: El usuario ya existe!')", true);
+                "Alert", @"alert('Error al eliminar usuario! - N/A')", true);
 
             }
+
+
         }
-    }
-
-
-    public void LimpiaText()
-    {
-        TextBox1.Text = null;
-        TextBox2.Text = null;
-        TextBox1.Focus();
-    }
-
-
-    protected void Unnamed1_Click(object sender, EventArgs e)
-    {
-        GuardaUsuario();
-        LimpiaText();
     }
 }

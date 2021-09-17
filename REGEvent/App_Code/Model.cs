@@ -35,5 +35,13 @@ public class Model
         
     }
 
-   
+    public class cliente
+    {
+        public string dpi { get; set; }
+        public string nombre { get; set; }
+
+        public string telefono { get; set; }
+
+    }
+
 }

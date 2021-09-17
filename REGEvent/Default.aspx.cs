@@ -14,6 +14,7 @@ using DayPilot.Web.Ui.Enums;
 using DayPilot.Web.Ui.Events.Scheduler;
 using BeforeEventRenderEventArgs = DayPilot.Web.Ui.Events.Calendar.BeforeEventRenderEventArgs;
 using CommandEventArgs = DayPilot.Web.Ui.Events.CommandEventArgs;
+using System.Web.UI;
 
 public partial class _Default : System.Web.UI.Page
 {
@@ -27,7 +28,7 @@ public partial class _Default : System.Web.UI.Page
                 Response.Redirect("Login.aspx");
             };
 
-            //GetResources();
+ 
             SetDataSourceAndBind();
             LoadResources();
         }
@@ -44,11 +45,10 @@ public partial class _Default : System.Web.UI.Page
                 DayPilotScheduler1.Update();
                 break;
             case "refresh":
-               // DayPilotScheduler1.DataSource = GetData(DayPilotScheduler1.StartDate, DayPilotScheduler1.EndDate.AddDays(1));
-                //DayPilotScheduler1.DataBind();
+ 
              
                 SetDataSourceAndBind();
-                //DayPilotScheduler1.DataBind();
+              
                 DayPilotScheduler1.Update();
                 DayPilotScheduler1.UpdateWithMessage("Eventos actualizados automaticamente");
                 break;
@@ -63,7 +63,7 @@ public partial class _Default : System.Web.UI.Page
 
     protected void DayPilotScheduler1_OnBeforeResHeaderRender(object sender, BeforeResHeaderRenderEventArgs e)
     {
-        // e.DataItem is only available when resources are reloaded from the database using LoadResources()
+ 
         if (e.DataItem != null)
         {
             e.Columns[0].Html = "" + e.DataItem["id"];
@@ -77,44 +77,98 @@ public partial class _Default : System.Web.UI.Page
         DateTime end = e.NewEnd;
         string resource = e.NewResource;
 
-        dbUpdateEvent(id, start, end, resource);
+        string actualiza = dbUpdateEvent(id, start, end, resource);
 
-        SetDataSourceAndBind();
-        DayPilotScheduler1.UpdateWithMessage("Evento Actualizado");
-        //DayPilotCalendar1.Update();
-    }
-
-    private void dbUpdateEvent(string id, DateTime start, DateTime end, string resource)
-    {
-        using (SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["daypilot"].ConnectionString))
+        if (actualiza =="OK")
         {
-            con.Open();
-            SqlCommand cmd = new SqlCommand("UPDATE [servicio_cliente] SET fecha_inicial = @fecha_inicial, fecha_final = @fecha_final, id_servicio =@id_servicio  WHERE id_servicio_cliente = @id_servicio_cliente  ", con);
-            cmd.Parameters.AddWithValue("id_servicio_cliente", Int32.Parse(id));
-            cmd.Parameters.AddWithValue("fecha_inicial", start);
-            cmd.Parameters.AddWithValue("fecha_final", end);
-            cmd.Parameters.AddWithValue("id_servicio", Int32.Parse(resource));
-            cmd.ExecuteNonQuery();
+
+
+            SetDataSourceAndBind();
+            DayPilotScheduler1.UpdateWithMessage("Evento Actualizado");
+        }
+        else
+
+        {
+            SetDataSourceAndBind();
+            DayPilotScheduler1.UpdateWithMessage("No se puede actualizar el evento, ya existe un evento de este tipo registrado en ese rango de  fechas");
         }
     }
+
+    private string dbUpdateEvent(string id, DateTime start, DateTime end, string resource)
+    {
+        string resultado = null;
+        if (ValidaEventosInsertados(start, end, Int32.Parse(resource)).Contains("OK"))
+        {
+
+                        using (SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["daypilot"].ConnectionString))
+            {
+                con.Open();
+                SqlCommand cmd = new SqlCommand("UPDATE [servicio_cliente] SET fecha_inicial = @fecha_inicial, fecha_final = @fecha_final, id_servicio =@id_servicio  WHERE id_servicio_cliente = @id_servicio_cliente  ", con);
+                cmd.Parameters.AddWithValue("id_servicio_cliente", Int32.Parse(id));
+                cmd.Parameters.AddWithValue("fecha_inicial", start);
+                cmd.Parameters.AddWithValue("fecha_final", end);
+                cmd.Parameters.AddWithValue("id_servicio", Int32.Parse(resource));
+                cmd.ExecuteNonQuery();
+            }
+            resultado = "OK";
+        }
+        else
+        {
+          
+            resultado = "NA";
+        }
+
+        return resultado;
+    }
+    public string ValidaEventosInsertados(DateTime f_inicial , DateTime f_final , int id_servicio)
+    {
+
+        int resultado;
+        string res, fi, ff;
+
+        fi = f_inicial.ToString("MM/dd/yyyy HH:mm:ss");
+        ff = f_final.ToString("MM/dd/yyyy HH:mm:ss");
+        using (SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["daypilot"].ConnectionString))
+        {
+
+            DateTime dt = DateTime.Parse(f_inicial.ToString("MM/dd/yyyy hh:mm:ss"));
+            con.Open();
+            SqlCommand cmd = new SqlCommand("SELECT  COUNT(1) FROM servicio_cliente  where((dateadd(minute,1,fecha_inicial) between @f_inicial and @f_final) or (dateadd(minute,-1,fecha_final) between @f_inicial and @f_final)) and id_servicio = @id_servicio  and id_estado = 1 ", con);
+            cmd.CommandType = CommandType.Text;
+            cmd.Parameters.AddWithValue("f_final", ff);
+            cmd.Parameters.AddWithValue("f_inicial", fi);
+            cmd.Parameters.AddWithValue("id_servicio", id_servicio);
+            resultado = (int)cmd.ExecuteScalar();
+
+
+        }
+
+        if (resultado >= 1)
+        {
+            res = "NA";
+        }
+        else
+        {
+            res=  "OK";
+        }
+
+
+        return res;
+
+    }
+
 
 
     private void SetDataSourceAndBind()
     {
-        DayPilotCalendar1.DataSource = GetData(DayPilotCalendar1.StartDate, DayPilotCalendar1.EndDate);
-        DayPilotCalendar1.DataStartField = "fecha_inicial";
-        DayPilotCalendar1.DataEndField = "fecha_final";
-        DayPilotCalendar1.DataIdField = "id_servicio_cliente";
-        DayPilotCalendar1.DataTextField = "descripcion";
+
         DayPilotScheduler1.DataTagFields = "id_servicio";
         DayPilotScheduler1.DataStartField = "fecha_inicial";
         DayPilotScheduler1.DataEndField = "fecha_final";
         DayPilotScheduler1.DataIdField = "id_servicio_cliente";
         DayPilotScheduler1.DataTextField = "descripcion";
         DayPilotScheduler1.DataResourceField = "id_servicio";
-        DayPilotCalendar1.ToolTip = "id_servicio";
-        DayPilotCalendar1.DataBind();
-        DayPilotScheduler1.DataSource = GetData(DayPilotCalendar1.StartDate, DayPilotCalendar1.EndDate);
+        DayPilotScheduler1.DataSource = GetData(DayPilotScheduler1.StartDate , DayPilotScheduler1.EndDate);
         DayPilotScheduler1.StartDate = DateTime.Today;
         DayPilotScheduler1.DataBind();
     }
@@ -131,29 +185,8 @@ public partial class _Default : System.Web.UI.Page
         return dt;
     }
 
-    protected void DayPilotCalendar1_Command(object sender, CommandEventArgs e)
-    {
-        switch (e.Command)
-        {
-            case "refresh":
-                SetDataSourceAndBind();
-                DayPilotCalendar1.Update();
-                break;
-
-        }
-    }
-
-    protected void PrintButton_Click(object sender, EventArgs e)
-    {
-        DateTime start = DayPilotCalendar1.StartDate;
-        int scroll = DayPilotCalendar1.ScrollY;
-        Response.Redirect("Print.aspx?start=" + start.ToString("s") + "&scroll=" + scroll);
-    }
 
 
-    protected void DayPilotCalendar1_OnBeforeEventRender(object sender, BeforeEventRenderEventArgs e)
-    {
-    }
 
     private DataTable GetResources(int subtype)
     {
@@ -178,58 +211,20 @@ public partial class _Default : System.Web.UI.Page
     protected void DayPilotScheduler1_BeforeEventRender(object sender, DayPilot.Web.Ui.Events.Scheduler.BeforeEventRenderEventArgs e)
     {
 
-        int status = Convert.ToInt32(e.Tag["id_servicio"]);
 
-        switch (status)
-        {
-            case 0: // new
-                if (e.Start < DateTime.Today.AddDays(2)) // must be confirmed two day in advance
+
+                if (e.End < DateTime.Now) 
                 {
                     e.DurationBarColor = "red";
-                    e.ToolTip = "Expired (not confirmed in time)";
-                }
-                else
-                {
-                    e.DurationBarColor = "orange";
-                    e.ToolTip = "New";
-                }
-                break;
-            case 1:  // confirmed
-                if (e.Start < DateTime.Today || (e.Start == DateTime.Today && DateTime.Now.TimeOfDay.Hours > 18))  // must arrive before 6 pm
-                {
-                    e.DurationBarColor = "#f41616";  // red
-                    e.ToolTip = "Late arrival";
+                    e.ToolTip = "Evento Finalizado";
                 }
                 else
                 {
                     e.DurationBarColor = "green";
-                    e.ToolTip = "Confirmed";
+                    e.ToolTip = "Evento Vigente";
                 }
-                break;
-            case 2: // arrived
-                if (e.End < DateTime.Today || (e.End == DateTime.Today && DateTime.Now.TimeOfDay.Hours > 11))  // must checkout before 10 am
-                {
-                    e.DurationBarColor = "#f41616"; // red
-                    e.ToolTip = "Late checkout";
-                }
-                else
-                {
-                    e.DurationBarColor = "#1691f4";  // blue
-                    e.ToolTip = "Arrived";
-                }
-                break;
-            case 3: // checked out
-                e.DurationBarColor = "gray";
-                e.ToolTip = "Checked out";
-                break;
-            default:
 
-                e.DurationBarColor = "green";
-                break;
-              
-                //throw new ArgumentException("Unexpected status.");
-        }
-        e.Html = String.Format("<div>{0} ({1:d} - {2:d})<br /><span style='color:gray'>{3}</span></div>", e.Text, e.Start, e.End, e.ToolTip);
+           e.Html = String.Format("<div>{0} ({1:d} - {2:d})<br /><span style='color:gray'>{3}</span></div>", e.Text, e.Start, e.End, e.ToolTip);
 
     }
 
@@ -245,8 +240,8 @@ public partial class _Default : System.Web.UI.Page
         {
             int id = Convert.ToInt32(subtype["id_sub_tipo_servicio"]);
          
-            Resource r = new Resource((string)subtype["descripcion"], null); // using null for resources that can't be used
-            r.IsParent = true; // marking as parent for the case that no children are loaded
+            Resource r = new Resource((string)subtype["descripcion"], null);  
+            r.IsParent = true;  
             r.Expanded = true;
             DayPilotScheduler1.Resources.Add(r);
 

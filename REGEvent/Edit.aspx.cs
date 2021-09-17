@@ -38,20 +38,30 @@ public partial class Edit : Page
 
             fecha_inicial.Text = Convert.ToDateTime(dr["fecha_inicial"]).ToString("M/d/yyyy HH:mm");
             fecha_final.Text = Convert.ToDateTime(dr["fecha_final"]).ToString("M/d/yyyy HH:mm");
-            descripcion.Text = (string) dr["descripcion"];
-        //    id_usuario.Text = dr["id_usuario"].ToString(); //no cambia nunca
+            descripcion.Text = (string)dr["descripcion"];
+            //    id_usuario.Text = dr["id_usuario"].ToString(); //no cambia nunca
             //id_servicio.Text = dr["id_servicio"].ToString(); //no cambia nunca
-             nombre_cliente.Text = dr["nombre"].ToString(); 
+            nombre_cliente.Text = dr["nombre"].ToString();
             total.Text = dr["total"].ToString();
             subtotal.Text = dr["subtotal"].ToString();
             servicio.Text = dr["servicio"].ToString();
+            cantidad.Text = (Convert.ToDateTime(fecha_final.Text) - Convert.ToDateTime(fecha_inicial.Text)).Hours.ToString();
 
+
+
+
+        }
+
+        if (cantidad.Text.Length > 0)
+        {
+            fecha_final.Text = Convert.ToDateTime(fecha_inicial.Text).AddHours(Double.Parse(cantidad.Text)).ToString("M/d/yyyy HH:mm");
+            total.Text = (float.Parse(subtotal.Text) * int.Parse(cantidad.Text)).ToString();
         }
     }
     protected void ButtonOK_Click(object sender, EventArgs e)
     {
-      
-   
+
+
         Model.ServicioCliente ser = new Model.ServicioCliente();
 
         ser.fecha_inicial = Convert.ToDateTime(fecha_inicial.Text);
@@ -70,7 +80,7 @@ public partial class Edit : Page
         da.SelectCommand.Parameters.AddWithValue("id", id);
         DataTable dt = new DataTable();
         da.Fill(dt);
-        
+
         if (dt.Rows.Count > 0)
         {
             return dt.Rows[0];
@@ -80,18 +90,22 @@ public partial class Edit : Page
 
     private void dbUpdateEvent(Model.ServicioCliente ser)
     {
-        using (SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["daypilot"].ConnectionString))
-        {
-            con.Open();
-            SqlCommand cmd = new SqlCommand("UPDATE [servicio_cliente] SET fecha_inicial = @fecha_inicial, fecha_final = @fecha_final, descripcion = @descripcion, total = @total,  subtotal = @subtotal WHERE id_servicio_cliente = @id_servicio_cliente", con);
-            cmd.Parameters.AddWithValue("id_servicio_cliente", ser.id_servicio_cliente);
-            cmd.Parameters.AddWithValue("fecha_inicial", ser.fecha_inicial);
-            cmd.Parameters.AddWithValue("fecha_final", ser.fecha_final);
-            cmd.Parameters.AddWithValue("descripcion", ser.descripcion);
-            cmd.Parameters.AddWithValue("total", ser.total);
-            cmd.Parameters.AddWithValue("subtotal", ser.subtotal);
-            cmd.ExecuteNonQuery();
-        }
+      
+
+            using (SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["daypilot"].ConnectionString))
+            {
+                con.Open();
+                SqlCommand cmd = new SqlCommand("UPDATE [servicio_cliente] SET fecha_inicial = @fecha_inicial, fecha_final = @fecha_final, descripcion = @descripcion, total = @total,  subtotal = @subtotal WHERE id_servicio_cliente = @id_servicio_cliente", con);
+                cmd.Parameters.AddWithValue("id_servicio_cliente", ser.id_servicio_cliente);
+                cmd.Parameters.AddWithValue("fecha_inicial", ser.fecha_inicial);
+                cmd.Parameters.AddWithValue("fecha_final", ser.fecha_final);
+                cmd.Parameters.AddWithValue("descripcion", ser.descripcion);
+                cmd.Parameters.AddWithValue("total", ser.total);
+                cmd.Parameters.AddWithValue("subtotal", ser.subtotal);
+                cmd.ExecuteNonQuery();
+            }
+ 
+      
     }
 
     private void dbDeleteEvent(string id)
@@ -100,6 +114,17 @@ public partial class Edit : Page
         {
             con.Open();
             SqlCommand cmd = new SqlCommand("update servicio_cliente set id_estado = 0  WHERE id_servicio_cliente = @id", con);
+            cmd.Parameters.AddWithValue("id", id);
+            cmd.ExecuteNonQuery();
+        }
+    }
+
+    private void dbCancelEvent(string id)
+    {
+        using (SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["daypilot"].ConnectionString))
+        {
+            con.Open();
+            SqlCommand cmd = new SqlCommand("update servicio_cliente set id_estado = 2  WHERE id_servicio_cliente = @id", con);
             cmd.Parameters.AddWithValue("id", id);
             cmd.ExecuteNonQuery();
         }
@@ -115,4 +140,13 @@ public partial class Edit : Page
         dbDeleteEvent(id);
         Modal.Close(this, "OK");
     }
+
+    protected void LinkButtonCancel_Click(object sender, EventArgs e)
+    {
+        string id = Request.QueryString["id"];
+        dbCancelEvent(id);
+        Modal.Close(this, "OK");
+    }
+
+   
 }

@@ -1,4 +1,4 @@
-﻿<%@ Page Language="C#" AutoEventWireup="true"  CodeFile="Default.aspx.cs" Inherits="_Default" MasterPageFile="~/Site.master" Title="Registro de eventos" %>
+﻿<%@ Page Language="C#" AutoEventWireup="true"  CodeFile="Calendar.aspx.cs" Inherits="_Default" MasterPageFile="~/Site.master" Title="Calendario de eventos" %>
 <%@ Register Assembly="DayPilot" Namespace="DayPilot.Web.Ui" TagPrefix="DayPilot" %>
 <asp:Content ID="HeaderContent" runat="server" ContentPlaceHolderID="HeadContent">
 	<script type="text/javascript" src="js/modal.js"></script>
@@ -20,57 +20,48 @@
             var data = this.result;
             if (data == "OK") {
             DayPilotCalendar1.commandCallBack("refresh");
-                DayPilotScheduler1.commandCallBack("refresh");
             }
         };
         return m;
     }
 </script>
 
+
     <div style="float:left; width: 150px">
     <DayPilot:DayPilotNavigator 
     ID="DayPilotNavigator1"
     runat="server" 
-    ShowMonths="3"
-    SkiptMonth="3"
-    BoundDayPilotID="DayPilotScheduler1"
+    ShowMonths="1"
+    SkiptMonth="1"
+    BoundDayPilotID="DayPilotCalendar1"
     />
  </div>
 
-    <div style="margin-left:220px">
-    <DayPilot:DayPilotScheduler 
-  ID="DayPilotScheduler1" 
-  runat="server" 
-        AutoRefreshEnabled="true"
-  CellDuration="60" 
-  TreeEnabled ="true"
-        TreePreventParentUsage ="true"
-            HeaderFontSize="8pt"
-        EventFontSize="8pt"
-           CellWidth="60"
-        EventHeight="60"
-        Days="2"
-        HeightSpec="Max"
-  TreeAnimation="False"
-    OnCommand="DayPilotScheduler1_Command" 
-            EventClickHandling="JavaScript"
-    EventClickJavaScript="modal().showUrl('Edit.aspx?id=' + e.id());"
-            TimeRangeSelectedHandling="JavaScript"
-         TimeRangeSelectedJavaScript="modal().showUrl('New.aspx?start=' + start + '&amp;end=' + end + '&amp;id=' + resource);"
-           EventMoveHandling="CallBack" 
-  OnEventMove="DayPilotScheduler1_EventMove" 
-        OnBeforeEventRender ="DayPilotScheduler1_BeforeEventRender"
-     DataStartField="fecha_inicial" 
+        <div style="margin-left:220px">
+    <DayPilot:DayPilotCalendar 
+    ID="DayPilotCalendar1" 
+    runat="server" 
+    ClientIDMode="Static"
+    ViewType="Week" 
+    OnCommand="DayPilotCalendar1_Command"
+    OnBeforeEventRender="DayPilotCalendar1_OnBeforeEventRender"
+    OnBeforeHeaderRender="DayPilotCalendar1_BeforeHeaderRender"   
+             DataStartField="fecha_inicial" 
   DataEndField="fecha_final" 
   DataTextField="descripcion_servicio" 
   DataValueField="id_servicio_cliente" 
   DataResourceField="id_servicio" 
   DataTagFields="id_servicio"
-        
-       HeaderDateFormat="dd/mm" TreeAutoExpand="False">
-   
-</DayPilot:DayPilotScheduler>  
- </div>
 
-   
+
+    WeekStarts="Monday" />
+            </div>
+
+<h2>Print</h2>
+
+<div class="space">
+<asp:Button runat="server" ID="PrintButton" Text="Print" 
+        onclick="PrintButton_Click" />
+</div>
+
 </asp:Content>

@@ -45,9 +45,12 @@ li a:hover:not(.active) {
 		
 					<h1 class="toolbar"></h1>
                        <ul class="nav navbar-nav">
-                        <li><a runat="server" href="Default.aspx">Inicio</a></li>
-                        <li><a runat="server" href="New_user.aspx">Usuarios</a></li>
-                        <li><a runat="server" href="~/Reporte.aspx">Reportes</a></li>
+                        <li><a runat="server" id="inicio" href="Default.aspx">Inicio</a></li>
+                           <li><a runat="server" id="calendario" href="Calendar.aspx">Calendario</a></li>
+                        <li><a runat="server" id="clientes" href="Clientes.aspx">Clientes</a></li>
+                        <li><a runat="server" id="usuarios" href="New_user.aspx">Usuarios</a></li>
+                        <li><a runat="server" id="reportes" href="Report.aspx">Reportes</a></li>
+                        <li><a runat="server" id="A1" href="Password.aspx">Cambio de contraseña</a></li>
                  <li style="float:right"><a class="active" href="Login.aspx">Salir</a></li>
                     </ul>
        
