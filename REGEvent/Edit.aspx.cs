@@ -1,19 +1,3 @@
-/* Copyright © 2014 Annpoint, s.r.o.
-   Use of this software is subject to license terms. 
-   http://www.daypilot.org/
-
-   If you have purchased a DayPilot Pro license, you are allowed to use this 
-   code under the conditions of DayPilot Pro License Agreement:
-
-   http://www.daypilot.org/files/LicenseAgreement.pdf
-
-   Otherwise, you are allowed to use it for evaluation purposes only under 
-   the conditions of DayPilot Pro Trial License Agreement:
-   
-   http://www.daypilot.org/files/LicenseAgreementTrial.pdf
-   
-*/
-
 using System;
 using System.Configuration;
 using System.Data;
@@ -29,6 +13,14 @@ public partial class Edit : Page
 
         if (!IsPostBack)
         {
+
+            //Si la sesión es nula, redirige a login.
+            if (System.Web.HttpContext.Current.Session["user"] == null)
+            {
+
+                Response.Redirect("Login.aspx");
+            };
+
             DataRow dr = dbGetEvent(Request.QueryString["id"]);
 
             if (dr == null)
@@ -36,11 +28,11 @@ public partial class Edit : Page
                 throw new Exception("El evento seleccionado no existe");
             }
 
+            //asigna valores iniciales
+
             fecha_inicial.Text = Convert.ToDateTime(dr["fecha_inicial"]).ToString("M/d/yyyy HH:mm");
             fecha_final.Text = Convert.ToDateTime(dr["fecha_final"]).ToString("M/d/yyyy HH:mm");
             descripcion.Text = (string)dr["descripcion"];
-            //    id_usuario.Text = dr["id_usuario"].ToString(); //no cambia nunca
-            //id_servicio.Text = dr["id_servicio"].ToString(); //no cambia nunca
             nombre_cliente.Text = dr["nombre"].ToString();
             total.Text = dr["total"].ToString();
             subtotal.Text = dr["subtotal"].ToString();
@@ -58,6 +50,7 @@ public partial class Edit : Page
             total.Text = (float.Parse(subtotal.Text) * int.Parse(cantidad.Text)).ToString();
         }
     }
+    //boton que actualiza los datos del evento
     protected void ButtonOK_Click(object sender, EventArgs e)
     {
 
@@ -74,6 +67,8 @@ public partial class Edit : Page
         Modal.Close(this, "OK");
     }
 
+
+    //Obtiene evento de base de datos
     private DataRow dbGetEvent(string id)
     {
         SqlDataAdapter da = new SqlDataAdapter("SELECT a.*, b.nombre, c.descripcion servicio FROM servicio_cliente a join cliente b on a.id_cliente= b.id_cliente join servicio c on c.id_servicio = a.id_servicio WHERE id_servicio_cliente = @id and a.id_estado = 1 ", ConfigurationManager.ConnectionStrings["daypilot"].ConnectionString);
@@ -88,6 +83,7 @@ public partial class Edit : Page
         return null;
     }
 
+    //actualiza evento en base de datos
     private void dbUpdateEvent(Model.ServicioCliente ser)
     {
       
@@ -108,6 +104,7 @@ public partial class Edit : Page
       
     }
 
+    //Elimina Evento de base de datos
     private void dbDeleteEvent(string id)
     {
         using (SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["daypilot"].ConnectionString))
@@ -119,6 +116,8 @@ public partial class Edit : Page
         }
     }
 
+
+    //Cancela evento en base de datos
     private void dbCancelEvent(string id)
     {
         using (SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["daypilot"].ConnectionString))
@@ -130,10 +129,13 @@ public partial class Edit : Page
         }
     }
 
+    //boton de cancelar, cierra el modal.
     protected void ButtonCancel_Click(object sender, EventArgs e)
     {
         Modal.Close(this);
     }
+
+    //evento al dar click en buton delete
     protected void LinkButtonDelete_Click(object sender, EventArgs e)
     {
         string id = Request.QueryString["id"];
@@ -141,6 +143,7 @@ public partial class Edit : Page
         Modal.Close(this, "OK");
     }
 
+    //evento al dar click en buton cancel
     protected void LinkButtonCancel_Click(object sender, EventArgs e)
     {
         string id = Request.QueryString["id"];

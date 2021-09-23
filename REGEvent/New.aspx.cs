@@ -11,8 +11,16 @@ public partial class New : Page
     {
         if (!IsPostBack)
         {
+
+            //Si la sesión es nula, redirige a login.
+            if (System.Web.HttpContext.Current.Session["user"] == null)
+            {
+
+                Response.Redirect("Login.aspx");
+            };
+
+            //asigna valores iniciales
             fecha_inicial.Text = Convert.ToDateTime(Request.QueryString["start"]).ToString("M/d/yyyy HH:mm");
-            //fecha_final.Text = Convert.ToDateTime(Request.QueryString["end"]).ToString("M/d/yyyy HH:mm");
             id_servicio.Text = Request.QueryString["id"].ToString();
             precio.Text =  ObtienePrecio(Request.QueryString["id"].ToString()).ToString();
             cantidad_hora.Text = "1";
@@ -31,13 +39,14 @@ public partial class New : Page
                 return;
             }
         }
-    
+    //asigna la cantidad de horas segun las fechas registradas.
         if (cantidad_hora.Text.Length > 0)
         {
             fecha_final.Text = Convert.ToDateTime(fecha_inicial.Text).AddHours(Double.Parse(cantidad_hora.Text)).ToString("M/d/yyyy HH:mm");
             total.Text = (float.Parse(precio.Text) * int.Parse(cantidad_hora.Text)).ToString();
         }
 
+        //valida que exista el dpi ingresado
         if (DPI.Text.Length > 0)
         {
             Model.cliente cli = new Model.cliente();
@@ -50,7 +59,7 @@ public partial class New : Page
                 {
                         Modal.Close(this, "OK");
                         Response.Write("<script>alert('Cliente No Existe por favor crearlo');</script>");
-                     //   Response.Redirect("Clientes.aspx");
+                    
                 }
         }
         
@@ -70,15 +79,13 @@ public partial class New : Page
         ser.subtotal = float.Parse(precio.Text);
         ser.total = float.Parse(total.Text);
         ser.id_usuario = Convert.ToInt32(id_usuario.Text);
-
-        //DateTime start = Convert.ToDateTime(fecha_inicial.Text);
-        //DateTime end = Convert.ToDateTime(fecha_final.Text);
+ 
         dbInsertEvent(ser);
 
-        //dbInsertEvent(start, end, TextBoxName.Text);
+ 
         Modal.Close(this, "OK");
     }
-
+    //Inserta a los nuevos clientes a base de datos.
     private void dbInsertEvent(Model.ServicioCliente ServicioNuevo)
     {
 
@@ -118,6 +125,7 @@ public partial class New : Page
         Modal.Close(this);
     }
 
+    //Obtiene precio del servicio elegido
     private float ObtienePrecio(string id)
     {
     
@@ -132,6 +140,7 @@ public partial class New : Page
         
     }
 
+    //Valida disponibilidad de las fechas para poder registrar nuevos servicios.
     public string ValidaEventosInsertados(DateTime f_inicial, DateTime f_final, int id_servicio)
     {
        // f_final = f_final.AddMinutes(-1);
@@ -155,6 +164,7 @@ public partial class New : Page
 
     }
 
+    //Obtiene listado de clientes para llenar grid
     private Model.cliente ObtieneCliente(string dpi)
     {
         SqlDataAdapter da = new SqlDataAdapter("select top 1 id_cliente, nombre from cliente WHERE   dpi=@dpi and id_estado = 1 ", ConfigurationManager.ConnectionStrings["daypilot"].ConnectionString);
@@ -179,6 +189,7 @@ public partial class New : Page
         return cli;
     }
 
+    //Obtiene usuario para registrar su id en el insert de nuevos clientes
     private string ObtieneUsuario(string nickname)
     {
         SqlDataAdapter da = new SqlDataAdapter("select top 1 id_usuario from usuario WHERE   nickname=@nickname and id_estado = 1 ", ConfigurationManager.ConnectionStrings["daypilot"].ConnectionString);

@@ -15,11 +15,14 @@ public partial class _Default : System.Web.UI.Page
     {
         if (!IsPostBack)
         {
-              if (System.Web.HttpContext.Current.Session["user"] == null)
+            //Si la sesión es nula, redirige a login.
+            if (System.Web.HttpContext.Current.Session["user"] == null)
             {
 
                 Response.Redirect("Login.aspx");
             };
+
+            //asigna valores iniciales
             DropDownList1.DataTextField = "descripcion";
             DropDownList1.DataValueField = "id_rol";
             DropDownList1.DataSource = ObtieneRol();
@@ -53,6 +56,8 @@ public partial class _Default : System.Web.UI.Page
         }
 
     }
+
+    //Obtiene listado de usuarios para llenar grid
     public DataTable ObtieneUsuarios()
     {
         SqlDataAdapter da = new SqlDataAdapter("select a.NICKNAME, b.descripcion ROL   from usuario a join rol b on a.id_rol = b.id_rol where a.id_estado = 1", ConfigurationManager.ConnectionStrings["daypilot"].ConnectionString);
@@ -73,6 +78,7 @@ public partial class _Default : System.Web.UI.Page
         return dt;
     }
 
+    //Inserta el usuario registrado en base de datos
     public void GuardaUsuario()
     {   
     Model.user us = new Model.user();
@@ -116,7 +122,7 @@ public partial class _Default : System.Web.UI.Page
 
 }
 
-
+    //Limpia los textbox despues de un ingreso de datos
 public void LimpiaText()
     {
         TextBox1.Text = null;
@@ -124,7 +130,7 @@ public void LimpiaText()
         TextBox1.Focus();
     }
 
-
+    
     public void Unnamed1_Click(object sender, EventArgs e)
     {
         GuardaUsuario();
@@ -139,7 +145,7 @@ public void LimpiaText()
         GridView1.DataSource = ObtieneUsuarios();
         GridView1.DataBind();
     }
-
+    //Elimina el usuario elegido segun su id
     public void EliminaUsuario()
     {
 

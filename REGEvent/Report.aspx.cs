@@ -18,13 +18,13 @@ public partial class _Default : System.Web.UI.Page
     protected void Page_Load(object sender, EventArgs e)
     {
         if (!IsPostBack)
-        {
-              if (System.Web.HttpContext.Current.Session["user"] == null)
+        {//Si la sesión es nula, redirige a login.
+            if (System.Web.HttpContext.Current.Session["user"] == null)
             {
 
                 Response.Redirect("Login.aspx");
             };
-
+            //asigna valores iniciales
             mes.InnerText = "Q." +  ObtieneTotalMes().ToString("0,0", CultureInfo.CurrentCulture);
             semana.InnerText = "Q." + ObtieneTotalSemana().ToString("0,0", CultureInfo.CurrentCulture);
             dia.InnerText = "Q." + ObtieneTotalDia().ToString("0,0", CultureInfo.CurrentCulture);
@@ -32,10 +32,10 @@ public partial class _Default : System.Web.UI.Page
         }
 
     }
-
+    //Obtiene data para grafica reporte de ventas
     public DataTable VentaSubTipo ()
     {
-        SqlDataAdapter da = new SqlDataAdapter("select * from ( select  isnull(a.total,0) total , u.nickname dsc, c.descripcion  from servicio_cliente a  join servicio b on a.id_servicio = b.id_servicio  join sub_tipo_servicio c on b.id_sub_tipo_servicio = c.id_sub_tipo_servicio join usuario u on u.id_usuario = a.id_usuario where fecha_inicial > getdate()-180 ) a pivot( count(total) for descripcion in (\"Inmobiliario\", \"Mobiliario\", \"Servicio de Banqueteria\", \"Pagos\")) as b ", ConfigurationManager.ConnectionStrings["daypilot"].ConnectionString);
+        SqlDataAdapter da = new SqlDataAdapter("select * from ( select  isnull(a.total,0) total , u.nickname dsc, c.descripcion  from servicio_cliente a  join servicio b on a.id_servicio = b.id_servicio  join sub_tipo_servicio c on b.id_sub_tipo_servicio = c.id_sub_tipo_servicio join usuario u on u.id_usuario = a.id_usuario where month(fecha_ingreso) = month(getdate()) ) a pivot( count(total) for descripcion in (\"Inmobiliario\", \"Mobiliario\", \"Servicio de Banqueteria\", \"Pagos\")) as b ", ConfigurationManager.ConnectionStrings["daypilot"].ConnectionString);
 
         DataTable dt = new DataTable();
         da.Fill(dt);
@@ -43,6 +43,7 @@ public partial class _Default : System.Web.UI.Page
         return dt;
     }
 
+    //convierte datatable a string para representarlo en grafica
     public string GetData(DataTable dt)
     {
         DataTable dts = new DataTable();
@@ -70,13 +71,13 @@ public partial class _Default : System.Web.UI.Page
         return Datos;
 
     }
-
+    //Obtiene sumatoria de ventas de total por mes
     public double  ObtieneTotalMes()
     {
         using (SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["daypilot"].ConnectionString))
         {
             con.Open();
-            SqlCommand cmd = new SqlCommand("select sum(total) from servicio_cliente where id_estado = 1 and  month(fecha_ingreso) = month(getdate()) ", con);
+            SqlCommand cmd = new SqlCommand("select isnull(sum(total),0) from servicio_cliente where id_estado = 1 and  month(fecha_ingreso) = month(getdate()) ", con);
             cmd.CommandType = CommandType.Text;
             double resultado;
             resultado = (double)cmd.ExecuteScalar();
@@ -87,12 +88,13 @@ public partial class _Default : System.Web.UI.Page
 
         }
     }
+    //Obtiene sumatoria de ventas de total por semana
     public double ObtieneTotalSemana()
     {
         using (SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["daypilot"].ConnectionString))
         {
             con.Open();
-            SqlCommand cmd = new SqlCommand("select sum(total) from servicio_cliente where id_estado = 1 and datepart(wk,fecha_ingreso) = datepart(wk,getdate()) ", con);
+            SqlCommand cmd = new SqlCommand("select isnull(sum(total),0) from servicio_cliente where id_estado = 1 and datepart(wk,fecha_ingreso) = datepart(wk,getdate()) ", con);
             cmd.CommandType = CommandType.Text;
             double resultado;
             resultado = (double)cmd.ExecuteScalar();
@@ -104,13 +106,14 @@ public partial class _Default : System.Web.UI.Page
         }
     }
 
+    //Obtiene sumatoria de ventas de total por día
     public double ObtieneTotalDia()
     {
         using (SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["daypilot"].ConnectionString))
         {
             con.Open();
             
-            SqlCommand cmd = new SqlCommand("select sum(total) from servicio_cliente where id_estado = 1 and day(fecha_ingreso) = day(getdate()) ", con);
+            SqlCommand cmd = new SqlCommand("select isnull(sum(total),0) from servicio_cliente where id_estado = 1 and day(fecha_ingreso) = day(getdate()) ", con);
             cmd.CommandType = CommandType.Text;
             double resultado;
             resultado = (double)cmd.ExecuteScalar();

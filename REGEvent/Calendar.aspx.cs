@@ -22,72 +22,21 @@ public partial class _Default : System.Web.UI.Page
     {
         if (!IsPostBack)
         {
-              if (System.Web.HttpContext.Current.Session["user"] == null)
+            //Si la sesión es nula, redirige a login.
+            if (System.Web.HttpContext.Current.Session["user"] == null)
             {
 
                 Response.Redirect("Login.aspx");
             };
             
+          SetDataSourceAndBind();
 
-
-            //GetResources();he
-            SetDataSourceAndBind();
-            //LoadResources();
         }
 
     }
-    /* protected void DayPilotScheduler1_Command(object sender, DayPilot.Web.Ui.Events.CommandEventArgs e)
-     {
-         switch (e.Command)
-         {
-             case "navigate":
-                 DayPilotScheduler1.StartDate = (DateTime)e.Data["day"];
-                 DayPilotScheduler1.DataSource = GetData(DayPilotScheduler1.StartDate, DayPilotScheduler1.EndDate.AddDays(1));
-                 DayPilotScheduler1.DataBind();
-                 DayPilotScheduler1.Update();
-                 break;
-             case "refresh":
-                // DayPilotScheduler1.DataSource = GetData(DayPilotScheduler1.StartDate, DayPilotScheduler1.EndDate.AddDays(1));
-                 //DayPilotScheduler1.DataBind();
-
-                 SetDataSourceAndBind();
-                 //DayPilotScheduler1.DataBind();
-                 DayPilotScheduler1.Update();
-                 DayPilotScheduler1.UpdateWithMessage("Eventos actualizados automaticamente");
-                 break;
-             case "sort":
-                 LoadResources();
-                 DayPilotScheduler1.DataSource = GetData(DayPilotScheduler1.StartDate, DayPilotScheduler1.EndDate.AddDays(1));
-                 DayPilotScheduler1.DataBind();
-                 DayPilotScheduler1.Update();
-                 break;
-         }
-     }
-
-     protected void DayPilotScheduler1_OnBeforeResHeaderRender(object sender, BeforeResHeaderRenderEventArgs e)
-     {
-         // e.DataItem is only available when resources are reloaded from the database using LoadResources()
-         if (e.DataItem != null)
-         {
-             e.Columns[0].Html = "" + e.DataItem["id"];
-         }
-     }
-
-     protected void DayPilotScheduler1_EventMove(object sender, DayPilot.Web.Ui.Events.EventMoveEventArgs e)
-     {
-         string id = e.Value;
-         DateTime start = e.NewStart;
-         DateTime end = e.NewEnd;
-         string resource = e.NewResource;
-
-         dbUpdateEvent(id, start, end, resource);
-
-         SetDataSourceAndBind();
-         DayPilotScheduler1.UpdateWithMessage("Evento Actualizado");
-         //DayPilotCalendar1.Update();
-     }*/
-
-    private void dbUpdateEvent(string id, DateTime start, DateTime end, string resource)
+    
+    
+  /*  private void dbUpdateEvent(string id, DateTime start, DateTime end, string resource)
     {
         using (SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["daypilot"].ConnectionString))
         {
@@ -99,7 +48,7 @@ public partial class _Default : System.Web.UI.Page
             cmd.Parameters.AddWithValue("id_servicio", Int32.Parse(resource));
             cmd.ExecuteNonQuery();
         }
-    }
+    }*/
 
     protected void DayPilotCalendar1_BeforeHeaderRender(object sender, BeforeHeaderRenderEventArgs e)
     {
@@ -129,7 +78,7 @@ public partial class _Default : System.Web.UI.Page
 
         return dt;
     }
-
+    /*
     protected void DayPilotCalendar1_Command(object sender, CommandEventArgs e)
     {
         switch (e.Command)
@@ -148,14 +97,14 @@ public partial class _Default : System.Web.UI.Page
 
         }
     }
-
-    protected void PrintButton_Click(object sender, EventArgs e)
+    */
+   /* protected void PrintButton_Click(object sender, EventArgs e)
     {
         DateTime start = DayPilotCalendar1.StartDate;
         int scroll = DayPilotCalendar1.ScrollY;
         Response.Redirect("Print.aspx?start=" + start.ToString("s") + "&scroll=" + scroll);
     }
-
+   */
 
     protected void DayPilotCalendar1_OnBeforeEventRender(object sender, BeforeEventRenderEventArgs e)
     {

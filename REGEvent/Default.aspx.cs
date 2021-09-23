@@ -22,18 +22,21 @@ public partial class _Default : System.Web.UI.Page
     {
         if (!IsPostBack)
         {
-              if (System.Web.HttpContext.Current.Session["user"] == null)
+            //Si la sesión es nula, redirige a login.
+            if (System.Web.HttpContext.Current.Session["user"] == null)
             {
 
                 Response.Redirect("Login.aspx");
             };
 
- 
+ //se cargan recursos inicales
             SetDataSourceAndBind();
             LoadResources();
         }
 
     }
+
+    //Actualiza eventos cuando se recibe un command
     protected void DayPilotScheduler1_Command(object sender, DayPilot.Web.Ui.Events.CommandEventArgs e)
     {
         switch (e.Command)
@@ -61,6 +64,7 @@ public partial class _Default : System.Web.UI.Page
         }
     }
 
+    //actualiza el html incluyendo el id
     protected void DayPilotScheduler1_OnBeforeResHeaderRender(object sender, BeforeResHeaderRenderEventArgs e)
     {
  
@@ -70,6 +74,7 @@ public partial class _Default : System.Web.UI.Page
         }
     }
 
+    //Captura el movimiento de eventos y asigna nuevas fechas en bd
     protected void DayPilotScheduler1_EventMove(object sender, DayPilot.Web.Ui.Events.EventMoveEventArgs e)
     {
         string id = e.Value;
@@ -94,6 +99,8 @@ public partial class _Default : System.Web.UI.Page
         }
     }
 
+
+    //actualiza fechas en base de datos
     private string dbUpdateEvent(string id, DateTime start, DateTime end, string resource)
     {
         string resultado = null;
@@ -120,6 +127,8 @@ public partial class _Default : System.Web.UI.Page
 
         return resultado;
     }
+
+    //valida disponibilidad de fecha para el movimiento de los eventos
     public string ValidaEventosInsertados(DateTime f_inicial , DateTime f_final , int id_servicio)
     {
 
@@ -158,7 +167,7 @@ public partial class _Default : System.Web.UI.Page
     }
 
 
-
+    //Actualiza y define los datasource del scheduler
     private void SetDataSourceAndBind()
     {
 
@@ -173,6 +182,7 @@ public partial class _Default : System.Web.UI.Page
         DayPilotScheduler1.DataBind();
     }
 
+    //obtiene catalogo de servicios
     private DataTable GetData(DateTime start, DateTime end)
     {
         SqlDataAdapter da = new SqlDataAdapter("select a.id_servicio, a.descripcion, a.id_servicio_cliente, a.fecha_inicial, a.fecha_final , b.descripcion descripcion_servicio from servicio_cliente a join servicio b on a.id_servicio = b.id_servicio  WHERE a.id_estado =1 and  NOT (([fecha_final] <= @start) OR ([fecha_inicial] >= @end))", ConfigurationManager.ConnectionStrings["daypilot"].ConnectionString);
@@ -187,7 +197,7 @@ public partial class _Default : System.Web.UI.Page
 
 
 
-
+    //Obtiene listado de recursos disponibles
     private DataTable GetResources(int subtype)
     {
         SqlDataAdapter da = new SqlDataAdapter("select id_servicio, descripcion from servicio where id_sub_tipo_servicio ="+ subtype, ConfigurationManager.ConnectionStrings["daypilot"].ConnectionString);
@@ -197,7 +207,7 @@ public partial class _Default : System.Web.UI.Page
 
         return dt;
     }
-
+//Obtiene recursos por subtipo
     private DataTable GetResourcesSubType()
     {
         SqlDataAdapter da = new SqlDataAdapter("select id_sub_tipo_servicio, descripcion from sub_tipo_servicio where id_estado = 1 ", ConfigurationManager.ConnectionStrings["daypilot"].ConnectionString);
@@ -208,6 +218,7 @@ public partial class _Default : System.Web.UI.Page
         return dt;
     }
 
+    //Identifica si los eventos estan vencidos para cambiar el html
     protected void DayPilotScheduler1_BeforeEventRender(object sender, DayPilot.Web.Ui.Events.Scheduler.BeforeEventRenderEventArgs e)
     {
 
@@ -228,6 +239,7 @@ public partial class _Default : System.Web.UI.Page
 
     }
 
+    //carga recursos para llenado de opciones
     private void LoadResources()
     {
         DataTable Resources = new DataTable();

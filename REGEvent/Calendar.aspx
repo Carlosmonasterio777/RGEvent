@@ -43,7 +43,6 @@
     runat="server" 
     ClientIDMode="Static"
     ViewType="Week" 
-    OnCommand="DayPilotCalendar1_Command"
     OnBeforeEventRender="DayPilotCalendar1_OnBeforeEventRender"
     OnBeforeHeaderRender="DayPilotCalendar1_BeforeHeaderRender"   
              DataStartField="fecha_inicial" 
@@ -57,11 +56,6 @@
     WeekStarts="Monday" />
             </div>
 
-<h2>Print</h2>
 
-<div class="space">
-<asp:Button runat="server" ID="PrintButton" Text="Print" 
-        onclick="PrintButton_Click" />
-</div>
 
 </asp:Content>

@@ -20,7 +20,7 @@ public partial class _Default : System.Web.UI.Page
         {
               if (System.Web.HttpContext.Current.Session["user"] == null)
             {
-
+                //Si la sesión es nula, redirige a login.
                 Response.Redirect("Login.aspx");
             };
         }
@@ -31,43 +31,7 @@ public partial class _Default : System.Web.UI.Page
 
 
 
-    public void GuardaUsuario()
-    {
-        /*Model.user us = new Model.user();
-
-        us.nickname = TextBox1.Text;
-        us.password = TextBox2.Text;
-        us.rol = Int32.Parse(DropDownList1.SelectedValue.ToString());
-        string resultado;
-        using (SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["daypilot"].ConnectionString))
-        {
-            con.Open();
-            SqlCommand cmd = new SqlCommand("GuardaUsuario", con);
-            cmd.CommandType = CommandType.StoredProcedure;
-            cmd.Parameters.AddWithValue("user", us.nickname);
-            cmd.Parameters.AddWithValue("pass", us.password);
-            cmd.Parameters.AddWithValue("rol", us.rol);
-            resultado = (string)cmd.ExecuteScalar();
-
-            if (resultado == "OK")
-            {
-
-                ScriptManager.RegisterClientScriptBlock(this, GetType(),
-                    "Alert", @"alert('Usuario registrado exitosamente')", true);
-                GridView1.DataSource = ObtieneUsuarios();
-                GridView1.DataBind();
-
-            }
-            else
-            {
-                ScriptManager.RegisterClientScriptBlock(this, GetType(),
-                "Alert", @"alert('Error al crear usuario: El usuario ya existe!')", true);
-
-            }
-        }*/
-    }
-
-
+    //Limpia textbox
     public void LimpiaText()
     {
         TextBox1.Text = null;
@@ -75,18 +39,21 @@ public partial class _Default : System.Web.UI.Page
         TextBox3.Text = null;
     }
 
-
+    //click en cambiar password
     protected void Unnamed1_Click(object sender, EventArgs e)
     {
         ValidaUsuario();
         LimpiaText();
     }
 
+    //click en cancelar
     protected void Unnamed2_Click(object sender, EventArgs e)
     {
         Response.Redirect("Default.aspx");
     }
 
+
+    //Valida que lo ingresado sea correcto para realizar el cambio de usuario
     protected void ValidaUsuario()
     {
         Model.user us = new Model.user();
@@ -145,6 +112,7 @@ public partial class _Default : System.Web.UI.Page
         }
         }
 
+    //Cambia password en base de datos
         protected string  CambiaPassword(string usuario, string password)
         {
          
