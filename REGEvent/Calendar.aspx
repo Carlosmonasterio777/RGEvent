@@ -46,6 +46,7 @@
     OnBeforeEventRender="DayPilotCalendar1_OnBeforeEventRender"
     OnBeforeHeaderRender="DayPilotCalendar1_BeforeHeaderRender"   
              DataStartField="fecha_inicial" 
+          OnCommand="DayPilotCalendar1_Command"
   DataEndField="fecha_final" 
   DataTextField="descripcion_servicio" 
   DataValueField="id_servicio_cliente" 

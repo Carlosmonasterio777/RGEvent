@@ -36,25 +36,12 @@ public partial class _Default : System.Web.UI.Page
     }
     
     
-  /*  private void dbUpdateEvent(string id, DateTime start, DateTime end, string resource)
-    {
-        using (SqlConnection con = new SqlConnection(ConfigurationManager.ConnectionStrings["daypilot"].ConnectionString))
-        {
-            con.Open();
-            SqlCommand cmd = new SqlCommand("UPDATE [servicio_cliente] SET fecha_inicial = @fecha_inicial, fecha_final = @fecha_final, id_servicio =@id_servicio  WHERE id_servicio_cliente = @id_servicio_cliente  ", con);
-            cmd.Parameters.AddWithValue("id_servicio_cliente", Int32.Parse(id));
-            cmd.Parameters.AddWithValue("fecha_inicial", start);
-            cmd.Parameters.AddWithValue("fecha_final", end);
-            cmd.Parameters.AddWithValue("id_servicio", Int32.Parse(resource));
-            cmd.ExecuteNonQuery();
-        }
-    }*/
-
+ //Actualiza formato de fecha
     protected void DayPilotCalendar1_BeforeHeaderRender(object sender, BeforeHeaderRenderEventArgs e)
     {
         e.Html = e.Date.ToString("dd/MM/yyyy");
     }
-
+    //Llena source
     private void SetDataSourceAndBind()
     {
         DayPilotCalendar1.DataSource = GetData(DayPilotCalendar1.StartDate, DayPilotCalendar1.EndDate);
@@ -66,7 +53,7 @@ public partial class _Default : System.Web.UI.Page
         DayPilotCalendar1.DataBind();
 
     }
-
+    //Obtiene eventos 
     private DataTable GetData(DateTime start, DateTime end)
     {
         SqlDataAdapter da = new SqlDataAdapter("select a.id_servicio, a.descripcion, a.id_servicio_cliente, a.fecha_inicial, a.fecha_final , b.descripcion descripcion_servicio from servicio_cliente a join servicio b on a.id_servicio = b.id_servicio  WHERE a.id_estado =1 and  NOT (([fecha_final] <= @start) OR ([fecha_inicial] >= @end))", ConfigurationManager.ConnectionStrings["daypilot"].ConnectionString);
@@ -78,7 +65,8 @@ public partial class _Default : System.Web.UI.Page
 
         return dt;
     }
-    /*
+    
+    //Actualiza calendario
     protected void DayPilotCalendar1_Command(object sender, CommandEventArgs e)
     {
         switch (e.Command)
@@ -97,15 +85,9 @@ public partial class _Default : System.Web.UI.Page
 
         }
     }
-    */
-   /* protected void PrintButton_Click(object sender, EventArgs e)
-    {
-        DateTime start = DayPilotCalendar1.StartDate;
-        int scroll = DayPilotCalendar1.ScrollY;
-        Response.Redirect("Print.aspx?start=" + start.ToString("s") + "&scroll=" + scroll);
-    }
-   */
+  
 
+    //Actualiza estado de calendario
     protected void DayPilotCalendar1_OnBeforeEventRender(object sender, BeforeEventRenderEventArgs e)
     {
   
@@ -126,6 +108,7 @@ e.Html = String.Format("<div>{0} ({1:d} - {2:d})<br /><span style='color:gray'>{
 
     }
 
+    //Obtiene Recursos
     private DataTable GetResources(int subtype)
     {
         SqlDataAdapter da = new SqlDataAdapter("select id_servicio, descripcion from servicio where id_sub_tipo_servicio ="+ subtype, ConfigurationManager.ConnectionStrings["daypilot"].ConnectionString);
@@ -140,7 +123,7 @@ e.Html = String.Format("<div>{0} ({1:d} - {2:d})<br /><span style='color:gray'>{
 
 
 
-
+    //Obtiene recursos por subtype
     private DataTable GetResourcesSubType()
     {
         SqlDataAdapter da = new SqlDataAdapter("select id_sub_tipo_servicio, descripcion from sub_tipo_servicio where id_estado = 1 ", ConfigurationManager.ConnectionStrings["daypilot"].ConnectionString);
